@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="en"><head><title>test/gol-engine-test</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="test/gol-engine-test"><meta name="groc-project-path" content="test/gol-engine-test.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">test/gol-engine-test.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chai'</span>).assert;
+<span class="hljs-keyword">var</span> GOL = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/gol-engine.js'</span>);
+<span class="hljs-keyword">var</span> golUtil = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/gol-util.js'</span>);
+<span class="hljs-keyword">var</span> golPatterns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/gol-patterns.js'</span>);
+
+describe(<span class="hljs-string">'Test GOL constructor &amp; methods'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  it(<span class="hljs-string">'Test Constructor, getCols() &amp; getRows()'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> dims = [[<span class="hljs-number">10</span>, <span class="hljs-number">20</span>], [<span class="hljs-number">15</span>, <span class="hljs-number">25</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>]];
+    dims.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">dim, index</span>) </span>{
+      <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({cols: dim[<span class="hljs-number">0</span>], rows: dim[<span class="hljs-number">1</span>]});
+      assert(dim[<span class="hljs-number">0</span>] === gol.getCols(), <span class="hljs-string">'Return value of gol.getCols() is not correct'</span>);
+      assert(dim[<span class="hljs-number">1</span>] === gol.getRows(), <span class="hljs-string">'Return value of gol.getRows() is not correct'</span>);
+    });
+  });
+
+  it(<span class="hljs-string">'Test Constructor with a matrix as the parameter'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> mat = [
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+    ];
+
+    <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({ matrix: mat });
+
+    <span class="hljs-keyword">var</span> dim = golUtil.getMatrixDimension(mat);
+
+    assert(dim.cols === gol.getCols(), <span class="hljs-string">'Return value of gol.getCols() is not correct'</span>);
+    assert(dim.rows === gol.getRows(), <span class="hljs-string">'Return value of gol.getRows() is not correct'</span>);
+
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;dim.rows; i++) {
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;dim.cols; j++) {
+        assert(mat[i][j] == gol.getCell(j, i),
+          <span class="hljs-string">'cell['</span> + i + <span class="hljs-string">','</span> + j + <span class="hljs-string">'] value is not correct'</span>);
+      }
+    }
+  });
+
+  it(<span class="hljs-string">'Test Constructor with a list of cells as the parameter'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> cells = [
+      {x:<span class="hljs-number">0</span>, y:<span class="hljs-number">0</span>, v:<span class="hljs-number">1</span>},
+      {x:<span class="hljs-number">1</span>, y:<span class="hljs-number">1</span>, v:<span class="hljs-number">1</span>},
+      {x:<span class="hljs-number">2</span>, y:<span class="hljs-number">2</span>, v:<span class="hljs-number">1</span>},
+      {x:<span class="hljs-number">3</span>, y:<span class="hljs-number">3</span>, v:<span class="hljs-number">1</span>},
+      {x:<span class="hljs-number">4</span>, y:<span class="hljs-number">4</span>, v:<span class="hljs-number">1</span>},
+    ];
+
+    <span class="hljs-keyword">var</span> matrix = [
+      [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+    ];
+
+    <span class="hljs-keyword">var</span> dim = golUtil.getMatrixDimension(matrix);
+    <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({ cols:dim.cols, rows:dim.rows, cells:cells });
+
+    assert(gol.getCols() === dim.cols, <span class="hljs-string">'Return value of gol.getCols() is incorrect'</span>);
+    assert(gol.getRows() === dim.rows, <span class="hljs-string">'Return value of gol.getRows() is incorrect'</span>);
+
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;dim.rows; i++) {
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;dim.cols; j++) {
+        assert(matrix[i][j] == gol.getCell(j, i),
+          <span class="hljs-string">'cell['</span> + i + <span class="hljs-string">','</span> + j + <span class="hljs-string">'] value is incorrect'</span>);
+      }
+    }
+  });
+
+  it(<span class="hljs-string">'Test getTotalSteps() method'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> matrix = golPatterns[<span class="hljs-string">'Beacon'</span>].matrix;
+    <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({matrix: matrix[<span class="hljs-number">0</span>]});
+    assert(gol.getTotalSteps() == <span class="hljs-number">0</span>, <span class="hljs-string">'Begin round should be step 0'</span>);
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">1</span>; i&lt;=<span class="hljs-number">100</span>; i++) {
+      gol.next();
+      assert(gol.getTotalSteps() == i, 
+        <span class="hljs-string">'TotalSteps at round#'</span> + i + <span class="hljs-string">' isnt correct'</span>);
+    }
+  });
+
+  it(<span class="hljs-string">'Test getAliveCells() method'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({
+      matrix: [
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      ]
+    });
+
+    <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">while</span>(i &lt; <span class="hljs-number">50</span>) {
+      gol.next();
+      i++;
+    }
+
+    <span class="hljs-keyword">var</span> rows = gol.getRows();
+    <span class="hljs-keyword">var</span> cols = gol.getCols();
+    alive = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;rows; i++) {
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;cols; j++) {
+        alive += gol.getCell(j, i);
+      }
+    }
+
+    assert(gol.getAliveCells() == alive, <span class="hljs-string">'Number of alive cells is incorrect'</span>);
+  });
+
+  it(<span class="hljs-string">'Test reset() method'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    [<span class="hljs-string">'Blinker'</span>, <span class="hljs-string">'Toad'</span>, <span class="hljs-string">'Beacon'</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, index</span>) </span>{
+      <span class="hljs-keyword">var</span> matrix = golPatterns[name].matrix;
+      
+      <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({matrix: matrix[<span class="hljs-number">0</span>]});
+      <span class="hljs-keyword">var</span> rows = gol.getRows();
+      <span class="hljs-keyword">var</span> cols = gol.getCols();
+      
+      gol.reset();
+      assert(gol.getAliveCells() == <span class="hljs-number">0</span>, <span class="hljs-string">'Number of alive cells is incorrect'</span>);
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;rows; i++) {
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;cols; j++) {
+          assert(gol.getCell(j, i) == <span class="hljs-number">0</span>, <span class="hljs-string">'cell['</span> + i + <span class="hljs-string">','</span> + j + <span class="hljs-string">'] must be 0'</span>);
+        }
+      }
+    });
+  });
+});
+
+describe(<span class="hljs-string">'Test GOL passes through patterns'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  
+  it(<span class="hljs-string">'Test with Still-lifes patterns'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    [<span class="hljs-string">'Block'</span>, <span class="hljs-string">'Beehive'</span>, <span class="hljs-string">'Loaf'</span>, <span class="hljs-string">'Boat'</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, index</span>) </span>{
+      <span class="hljs-keyword">var</span> matrix = golPatterns[name].matrix;
+      
+      <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({matrix: matrix[<span class="hljs-number">0</span>]});
+      <span class="hljs-keyword">var</span> rows = gol.getRows();
+      <span class="hljs-keyword">var</span> cols = gol.getCols();
+
+      assert(gol.getTotalSteps() === <span class="hljs-number">0</span>, <span class="hljs-string">'Total number of steps must be zero.'</span>);
+
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> k=<span class="hljs-number">1</span>; k&lt;<span class="hljs-number">4</span>; k++) {
+        gol.next();
+        assert(gol.getTotalSteps() === k, <span class="hljs-string">'Total number of steps must be '</span> + k);
+      }
+
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;rows; i++) {
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;cols; j++) {
+          assert(matrix[<span class="hljs-number">0</span>][i][j] == gol.getCell(j, i), 
+            <span class="hljs-string">'cell['</span> + i + <span class="hljs-string">','</span> + j + <span class="hljs-string">'] is incorrect'</span>);
+        }
+      }  
+    })
+  });
+
+  it(<span class="hljs-string">'Test with Oscillators patterns'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    [<span class="hljs-string">'Blinker'</span>, <span class="hljs-string">'Toad'</span>, <span class="hljs-string">'Beacon'</span>].forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name, index</span>) </span>{
+      <span class="hljs-keyword">var</span> matrix = golPatterns[name].matrix;
+      
+      <span class="hljs-keyword">var</span> gol = <span class="hljs-keyword">new</span> GOL({matrix: matrix[<span class="hljs-number">0</span>]});
+      <span class="hljs-keyword">var</span> rows = gol.getRows();
+      <span class="hljs-keyword">var</span> cols = gol.getCols();
+      
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> k=<span class="hljs-number">1</span>; k&lt;golPatterns[name].period; k++) {
+        gol.next();
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;rows; i++) {
+          <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;cols; j++) {
+            assert(matrix[k][i][j] == gol.getCell(j, i), 
+              <span class="hljs-string">'cell['</span> + i + <span class="hljs-string">','</span> + j + <span class="hljs-string">'] is wrong'</span>);
+          }
+        }  
+      }
+
+      gol.next();
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;rows; i++) {
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> j=<span class="hljs-number">0</span>; j&lt;cols; j++) {
+          assert(matrix[<span class="hljs-number">0</span>][i][j] == gol.getCell(j, i), 
+            <span class="hljs-string">'cell['</span> + i + <span class="hljs-string">','</span> + j + <span class="hljs-string">'] is wrong'</span>);
+        }
+      }
+    });
+  });
+});</div></div></div></div></body></html>

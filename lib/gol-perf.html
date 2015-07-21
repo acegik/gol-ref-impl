@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/gol-perf</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="lib/gol-perf"><meta name="groc-project-path" content="lib/gol-perf.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/gol-perf.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Perf</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">this</span>.time = <span class="hljs-built_in">Date</span>.now();
+}
+
+Perf.prototype.stop = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> {
+    time_usage: <span class="hljs-built_in">Date</span>.now() - <span class="hljs-keyword">this</span>.time,
+    memory_usage: process.memoryUsage().rss
+  }
+}
+
+<span class="hljs-built_in">module</span>.exports = Perf;</div></div></div></div></body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><title>test/gol-util-test</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="test/gol-util-test"><meta name="groc-project-path" content="test/gol-util-test.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">test/gol-util-test.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chai'</span>).assert;
+<span class="hljs-keyword">var</span> golUtil = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../lib/gol-util.js'</span>);
+
+describe(<span class="hljs-string">'Test function getMatrixDimension()'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+  it(<span class="hljs-string">'Test valid parameters'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> matrices = [
+      [
+        [<span class="hljs-number">0</span>]
+      ],
+      [
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+      ],
+      [
+        [<span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>]
+      ],
+      [
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+        [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+      ],
+    ];
+    matrices.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">matrix, index</span>) </span>{
+      <span class="hljs-keyword">var</span> dim = golUtil.getMatrixDimension(matrix);
+      assert(dim.cols === matrix[<span class="hljs-number">0</span>].length &amp;&amp; dim.rows === matrix.length, 
+        <span class="hljs-string">'getMatrixDimension() apply for '</span> + 
+        <span class="hljs-built_in">JSON</span>.stringify(matrix) + <span class="hljs-string">' is not correct'</span>);
+    });
+  });
+
+  it(<span class="hljs-string">'Test invalid parameters'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> dim = golUtil.getMatrixDimension(<span class="hljs-string">'string'</span>);
+    assert.isUndefined(dim.cols, <span class="hljs-string">'cols value should be undefined'</span>);
+    assert.isUndefined(dim.rows, <span class="hljs-string">'rows value should be undefined'</span>);
+
+    dim = golUtil.getMatrixDimension([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]);
+    assert.isUndefined(dim.cols, <span class="hljs-string">'cols value should be undefined'</span>);
+    assert.strictEqual(dim.rows, <span class="hljs-number">4</span>, <span class="hljs-string">'rows value is not correct'</span>);
+  });
+});</div></div></div></div></body></html>
